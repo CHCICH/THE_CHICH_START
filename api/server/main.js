@@ -1,13 +1,24 @@
 const express = require('express');
 const app = express();
 const SERVER_PORT = 5000;
-
-app.get('/',(req,res)=>{
-    res.status(200).send('hello guys')
-})
+const {LoginRouter, CartRouter,pageRouter,UserDataRouter} = require('../routes/MainRoute');
+const {directTothepath} = require('../utils/direction');
 
 
+app.use(express.static(directTothepath(__dirname,"PUBLIC_STATIC")+'front-end'));
+app.use(express.json());
 
-app.listen(SERVER_PORT,()=>{
-    console.log(`server listening to port ${SERVER_PORT}`);
-})
+app.use('/',pageRouter);
+app.use('/login', LoginRouter);
+app.use('/cart', CartRouter);
+app.use('/user',UserDataRouter)
+
+
+app.listen(SERVER_PORT, async ()=>{
+    try{
+        console.log(`the server is listening to port ${SERVER_PORT}`)
+    }
+    catch(err){
+        console.log(err)
+    }
+});
