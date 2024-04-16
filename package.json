@@ -1,0 +1,16 @@
+{
+  "name": "chich",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api/server/main.js",
+  "scripts": {
+    "test": "test",
+    "start": "node  api/server/main.js",
+    "dev" : "nodemon api/server/main.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
