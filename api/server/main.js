@@ -4,15 +4,19 @@ const SERVER_PORT = 5000;
 const {LoginRouter, CartRouter,pageRouter,UserDataRouter} = require('../routes/MainRoute');
 const {directTothepath} = require('../utils/direction');
 
+//other middlewares
 
 app.use(express.static(directTothepath(__dirname,"PUBLIC_STATIC")+'front-end'));
 app.use(express.json());
 
+//routes
+
 app.use('/',pageRouter);
 app.use('/login', LoginRouter);
 app.use('/cart', CartRouter);
-app.use('/user',UserDataRouter)
+app.use('/user',UserDataRouter);
 
+//
 
 app.listen(SERVER_PORT, async ()=>{
     try{
