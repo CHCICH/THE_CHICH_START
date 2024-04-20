@@ -42,5 +42,10 @@ class Response {
         this.data = data;
     }
 }
-
-module.exports = {Response,Cart,Item,UserData}
+class UserID{
+    constructor(UserID,msg){
+        this.UserID = UserID;
+        this.msg = msg;
+    }
+}
+module.exports = {Response,Cart,Item,UserData,UserID}

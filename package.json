@@ -6,11 +6,12 @@
   "scripts": {
     "test": "test",
     "start": "node  api/server/main.js",
-    "dev" : "nodemon api/server/main.js"
+    "dev": "nodemon api/server/main.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "email-validator": "^2.0.4",
     "nodemon": "^3.1.0"
   }
 }

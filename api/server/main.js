@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const SERVER_PORT = 5000;
-const {LoginRouter, CartRouter,pageRouter,UserDataRouter} = require('../routes/MainRoute');
+const {LoginRouter, CartRouter,pageRouter,UserDataRouter, SignUpRouter} = require('../routes/MainRoute');
 const {directTothepath} = require('../utils/direction');
 
 //other middlewares
@@ -15,6 +15,7 @@ app.use('/',pageRouter);
 app.use('/login', LoginRouter);
 app.use('/cart', CartRouter);
 app.use('/user',UserDataRouter);
+app.use('/signup',SignUpRouter)
 
 //
 
