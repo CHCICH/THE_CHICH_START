@@ -13,17 +13,24 @@ class Error{
 };
 
 class SignUpError{
-    constructor(emailError , UsernameError,emailAlreadyExists,usernameAlreadyExists){
+    constructor(emailError , UsernameError,emailAlreadyExists,usernameAlreadyExists, EmailIsEmplty,UserNameIsEmpty, passwordIsEmpty, passwordIsNotLongEnough){
         this.emailError = emailError;
         this.UsernameError = UsernameError;
         this.emailAlreadyExists = emailAlreadyExists;
         this.usernameAlreadyExists = usernameAlreadyExists;
+        this.EmailIsEmplty = EmailIsEmplty;
+        this.UserNameIsEmpty = UserNameIsEmpty;
+        this.passwordIsEmpty = passwordIsEmpty;
+        this.passwordIsNotLongEnough = passwordIsNotLongEnough;
     }
     addUsernameMessage(msg){
         this.UsernameErrorMessage = msg;
     }
     addEmailMessage(msg){
         this.EmailErrorMessage = msg;
+    }
+    addPasswordMessage(msg){
+        this.PasswordErrorMessage = msg;
     }
     
 }

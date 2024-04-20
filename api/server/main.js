@@ -3,12 +3,12 @@ const app = express();
 const SERVER_PORT = 5000;
 const {LoginRouter, CartRouter,pageRouter,UserDataRouter, SignUpRouter} = require('../routes/MainRoute');
 const {directTothepath} = require('../utils/direction');
-
+const {DateForLog} = require('../middleware/Logs');
 //other middlewares
 
 app.use(express.static(directTothepath(__dirname,"PUBLIC_STATIC")+'front-end'));
 app.use(express.json());
-
+app.use(DateForLog)
 //routes
 
 app.use('/',pageRouter);

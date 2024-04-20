@@ -10,40 +10,69 @@ const {EncryptedData} = require('../models/EncryptData/de-encrypt');
 
 const spacesValidation = /\s/;
 const createAccount = async (req,res)=>{
-    let {newEmail, newUsername, password } = req.body;
-    let AcctualUserTable = await readDataBase('./db/UserFiles/Users.json','utf-8');
-    let ParsedAcctualUserTable = await JSON.parse(AcctualUserTable);
-    let EmailAlreadyExists = await ParsedAcctualUserTable.find(({email}) => email === EncryptedData(newEmail,'EMAIL_HASHING'));
-    let UserNameAlreadyExists = await ParsedAcctualUserTable.find(({username}) => username === newUsername);
-    let thereIsNoError = validator.validate(newEmail) && !(spacesValidation.test(newUsername) ) && !EmailAlreadyExists && !UserNameAlreadyExists;
+    try {
+        let {newEmail, newUsername, password } = req.body;
+        let AcctualUserTable = await readDataBase('./db/UserFiles/Users.json','utf-8');
+        let ParsedAcctualUserTable = await JSON.parse(AcctualUserTable);
+        let EmailAlreadyExists = await ParsedAcctualUserTable.find(({email}) => email === EncryptedData(newEmail,'EMAIL_HASHING'));
+        let UserNameAlreadyExists = await ParsedAcctualUserTable.find(({username}) => username === newUsername);
+        let thereIsNoError = validator.validate(newEmail) && !(spacesValidation.test(newUsername) ) && !EmailAlreadyExists && !UserNameAlreadyExists && newEmail.length !== 0 && newUsername.length !==0 && password.length !== 0 && password.length > 6 ;
 
-    if(!thereIsNoError){
-        let ErrorList = new SignUpError(!validator.validate(newEmail),(spacesValidation.test(newUsername)),EmailAlreadyExists,UserNameAlreadyExists);
+        if(!thereIsNoError){
+            let ErrorList = new SignUpError(!validator.validate(newEmail),(spacesValidation.test(newUsername)),EmailAlreadyExists,UserNameAlreadyExists,newEmail.length === 0,newUsername.length ===0, password.length === 0, password.length < 6 );
+            //email error handling
+            if(ErrorList.emailError){
+                ErrorList.addEmailMessage("Invalid Email this email do not exist or invalid format")
+            }
+            if(ErrorList.EmailIsEmplty){
+                ErrorList.addEmailMessage("Please enter your email");
+            }
+            if(ErrorList.emailAlreadyExists){
+                ErrorList.addEmailMessage("there is an account with this particular email");
+            }
+            //username error handling 
+            if(ErrorList.UserNameIsEmpty){
+                ErrorList.addUsernameMessage("Please enter a username")
+            }
+            if(ErrorList.usernameAlreadyExists){
+                ErrorList.addUsernameMessage("This username is already taken try another one")
+            }
+            if(ErrorList.UsernameError){
+                ErrorList.addUsernameMessage("Username cannot contain Spaces");
+            }
+            // password error handling
+            if(ErrorList.passwordIsNotLongEnough){
+                ErrorList.addPasswordMessage("the password should be minimum 7 characters long")
+            }
+            if(ErrorList.passwordIsEmpty){
+                ErrorList.addPasswordMessage("Please fill in the password to sign up");
+            }
+
+            res.status(401).send(new Error({emailError: ErrorList.EmailErrorMessage, usernameError :ErrorList.UsernameErrorMessage ,passwordError:ErrorList.PasswordErrorMessage}));
+
+        }
         
-        if(ErrorList.emailError){
-            ErrorList.addEmailMessage("Invalid Email this email do not exist or invalid format")
-        }
+        if(thereIsNoError){
+            //save to the database and precisely to the table of users
 
-        if(ErrorList.UsernameError){
-            ErrorList.addUsernameMessage("Username cannot contain Spaces");
-        }
-        if(ErrorList.usernameAlreadyExists){
-            ErrorList.addUsernameMessage("This username is already taken try another one")
-        }
-        if(ErrorList.emailAlreadyExists){
-            ErrorList.addEmailMessage("there is an account with this particular email");
-        }
+            let UserInformation = new UserData(newUsername,password,newEmail);
+            await ParsedAcctualUserTable.push(UserInformation);
+            let FinalUserTable = await JSON.stringify(ParsedAcctualUserTable);
+            await writeDataBase('./db/UserFiles/Users.json',FinalUserTable,'utf-8');
+            
+            //
 
-        res.status(401).send(new Error({emailError: ErrorList.EmailErrorMessage, usernameError :ErrorList.UsernameErrorMessage}));
+            //save to the logs 
 
+            let logsMessage = `${req.time} new User was Created => UserID : ${UserInformation.UserID}`;
+            await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+
+            //
+            res.status(200).send(new Response(true,new UserID(UserInformation.UserID,'User was succesfully saved and registered')))
+        }
     }
-    
-    if(thereIsNoError){
-        let UserInformation = new UserData(newUsername,password,newEmail);
-        await ParsedAcctualUserTable.push(UserInformation);
-        let FinalUserTable = await JSON.stringify(ParsedAcctualUserTable);
-        await writeDataBase('./db/UserFiles/Users.json',FinalUserTable,'utf-8');
-        res.status(200).send(new Response(true,new UserID(UserInformation.UserID,'User was succesfully saved and registered')))
+    catch(error){
+        console.log(error);
     }
 }
 

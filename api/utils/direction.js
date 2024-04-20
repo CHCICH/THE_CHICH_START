@@ -12,5 +12,7 @@ const directTothepath = (dirname,type) =>{
         return dirname
     }
 }
-
+const SaveToLogs = ()=>{
+    
+}
 module.exports = {directTothepath}
