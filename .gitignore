@@ -1,2 +1,3 @@
 api/models/EncryptData
-db
+db/UserFiles
+db/logs
