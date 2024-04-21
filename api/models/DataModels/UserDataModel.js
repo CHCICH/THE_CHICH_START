@@ -1,4 +1,5 @@
 const {EncryptedData} = require('../EncryptData/de-encrypt');
+const uniqid = require('uniqid');
 
 class UserData{
     constructor(username,password,email){
@@ -6,6 +7,10 @@ class UserData{
         this.username = EncryptedData(username,'USERNAME_HASHING' );
         this.password = EncryptedData(password,'PASSWORD_HASING');
         this.email = EncryptedData(email,'EMAIL_HASHING');
+        
+    }
+    createSecret(){
+        this.userSecret = uniqid() + this.UserID;
     }
 }
 
@@ -43,8 +48,9 @@ class Response {
     }
 }
 class UserID{
-    constructor(UserID,msg){
+    constructor(UserID,userSecret,msg){
         this.UserID = UserID;
+        this.userSecret = userSecret;
         this.msg = msg;
     }
 }

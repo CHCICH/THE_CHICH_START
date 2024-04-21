@@ -48,7 +48,7 @@ const createAccount = async (req,res)=>{
                 ErrorList.addPasswordMessage("Please fill in the password to sign up");
             }
 
-            res.status(401).send(new Error({emailError: ErrorList.EmailErrorMessage, usernameError :ErrorList.UsernameErrorMessage ,passwordError:ErrorList.PasswordErrorMessage}));
+            res.status(401).json(new Error({emailError: ErrorList.EmailErrorMessage, usernameError :ErrorList.UsernameErrorMessage ,passwordError:ErrorList.PasswordErrorMessage}));
 
         }
         
@@ -56,6 +56,7 @@ const createAccount = async (req,res)=>{
             //save to the database and precisely to the table of users
 
             let UserInformation = new UserData(newUsername,password,newEmail);
+            await UserInformation.createSecret();
             await ParsedAcctualUserTable.push(UserInformation);
             let FinalUserTable = await JSON.stringify(ParsedAcctualUserTable);
             await writeDataBase('./db/UserFiles/Users.json',FinalUserTable,'utf-8');
@@ -65,10 +66,12 @@ const createAccount = async (req,res)=>{
             //save to the logs 
 
             let logsMessage = `${req.time} new User was Created => UserID : ${UserInformation.UserID}`;
+            let oldDb = await readDataBase('./db/logs/UsersLogs.log','utf-8');
+            logsMessage = await `${logsMessage} \n${oldDb}`;
             await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
 
             //
-            res.status(200).send(new Response(true,new UserID(UserInformation.UserID,'User was succesfully saved and registered')))
+            res.status(200).json(new Response(true,new UserID(UserInformation.UserID,UserInformation.userSecret,'User was succesfully saved and registered')))
         }
     }
     catch(error){
