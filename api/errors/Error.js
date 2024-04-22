@@ -34,5 +34,24 @@ class SignUpError{
     }
     
 }
+class SignInError{
+    constructor(emailOrUsernameNotFound, EmailOrUsernameIsEmpty, passwordIsEmpty,wrongPassword){
+        this.emailOrUsernameNotFound = emailOrUsernameNotFound;
+        this.EmailOrUsernameIsEmpty = EmailOrUsernameIsEmpty;
+        this.wrongPassword = wrongPassword;
+        this.passwordIsEmpty = passwordIsEmpty;
+    }
+    ErrorExists(){
+        return this.EmailOrUsernameIsEmpty && this.emailOrUsernameNotFound && this.passwordIsEmpty;
+    }
+    addUsernameOrEmailMessage(msg){
+        this.UsernameOrEmailErrorMessage = msg;
 
-module.exports = {Error,SignUpError}
+    }
+    addPasswordMessage(msg){
+        this.PasswordErrorMessage = msg;
+
+    }
+}
+
+module.exports = {Error,SignUpError,SignInError}
