@@ -7,6 +7,7 @@ const writeDataBase = utils.promisify(writeFile);
 const {Error,SignInError} = require('../errors/Error');
 
 const LogIn = async (req,res)=>{
+    
     const readDataBase = await readTables('./db/UserFiles/Users.json','utf-8');
     let DataUsersTable = await JSON.parse(readDataBase);
     const {UsernameOrEmail,password} = req.body;
@@ -32,9 +33,13 @@ const LogIn = async (req,res)=>{
             //
             res.status(400).json(new Error({emailOrUsernameError:SignInErrors.UsernameOrEmailErrorMessage, passwordErrror:SignInErrors.PasswordErrorMessage}))
         }else if(isUserTrue){
-
+            
             if(SignInErrors.wrongPassword){
-                res.status(400).json(new Error({PasswordError:"wrong password please write a valid password"}));
+                if(password.length === 0 ){
+                    res.status(400).json(new Error({PasswordError:"Please type your password"}))
+                }else{
+                    res.status(400).json(new Error({PasswordError:"wrong password please write a valid password"}));
+                }
             }
 
             else if(isUserTrue.password === passwordEnterdEncrypted){
