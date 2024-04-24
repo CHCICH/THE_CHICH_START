@@ -12,6 +12,15 @@ class Error{
     }
 };
 
+class ErrorEditing{
+    constructor(type){
+        this.type = type;
+    }
+    addErrorMessage(msg){
+        this.ErrorMessage = msg;
+    }
+}
+
 class SignUpError{
     constructor(emailError , UsernameError,emailAlreadyExists,usernameAlreadyExists, EmailIsEmplty,UserNameIsEmpty, passwordIsEmpty, passwordIsNotLongEnough){
         this.emailError = emailError;
@@ -54,4 +63,4 @@ class SignInError{
     }
 }
 
-module.exports = {Error,SignUpError,SignInError}
+module.exports = {Error,SignUpError,SignInError, ErrorEditing}
