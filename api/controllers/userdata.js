@@ -62,3 +62,4 @@ const editInfo = async (req,res) =>{
     }
 }
 
+module.exports = {editInfo}
