@@ -14,89 +14,88 @@ const editInfo = async (req,res) =>{
     const usableUserTable = JSON.parse(readUserTable);
     const validUser = usableUserTable.find(user => user.UserID === UserID);
     console.log(req.query)
-    if(validUser){
-        if(editingInfo === 'email'){
-            const {newEmail} = req.body;
-            const thereIsAnError = !validator.validate(newEmail) || validUser.email === EncryptedData(newEmail) || newEmail.length === 0
-            if(thereIsAnError){
-                // error handling 
-                const ErrorsList = new ErrorEditing('email');
+    try{
+        if(validUser){
+            if(editingInfo === 'email'){
+                const {newEmail} = req.body;
+                const thereIsAnError = !validator.validate(newEmail) || validUser.email === EncryptedData(newEmail,'EMAIL_HASHING') || newEmail.length === 0
+                const errorList = {
+                    firstError:(!validator.validate(newEmail)),
+                    firstErrorMessage:'please enter a valid email',
+                    secondError:validUser.email === EncryptedData(newEmail,'EMAIL_HASHING'),
+                    secondErrorMessage:'your mail cannot be the same as the previous ',
+                    thirdError:newEmail.length === 0,
+                    thirdErrorMessage:'Please write the email that you want to edit'
+                }
+                await editData(res,req,thereIsAnError,errorList,validUser,newEmail,'email',UserID,usableUserTable);
 
-                if(!validator.validate(newEmail)){
-                    ErrorsList.addErrorMessage('please enter a valid email');
+            }else if(editingInfo === 'username'){
+                const {username} = req.body;
+                const spacesValidation = /\s/;
+                const thereIsAnError = username === validUser.username || username.length === 0 || (spacesValidation.test(username));
+                const errorList = {
+                    firstError:(spacesValidation.test(username)),
+                    firstErrorMessage:'please enter a valid username that do not contain spaces',
+                    secondError:username === validUser.username,
+                    secondErrorMessage:'your username cannot be the same as the previous ',
+                    thirdError:username.length === 0,
+                    thirdErrorMessage:'Please write the username that you want to edit'
                 }
-                if(validUser.email === EncryptedData(newEmail)){
-                    ErrorsList.addErrorMessage('your mail cannot be the same as the previous ');
-                }
-                if(newEmail.length === 0){
-                    ErrorsList.addErrorMessage('Please write the email that you want to edit');
-                }
-                res.status(400).json(new Error({emailErrorMessage:ErrorsList.ErrorMessage}));
-            }else{
-                
-                let newValidUser = await validUser;
-                newValidUser.email = EncryptedData(newEmail);
-                const newUserTable = usableUserTable.map(user =>{if(user.UserID === UserID){return newValidUser;}return user});
-                //saving data to the db 
-                await writeDataBase('./db/UserFiles/Users.json',newUserTable,'utf-8');
-                //
-                // saving the login to the logs 
-                let logsMessage = `${req.time} User edited his email => UserID : ${validUser.UserID}`;
-                let oldDb = await readDataBase('./db/logs/UsersLogs.log','utf-8');
-                logsMessage = await `${logsMessage} \n${oldDb}`;
-                await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
-                //
+                await editData(res,req,thereIsAnError,errorList,validUser,username,'username',UserID,usableUserTable);
 
-                res.status(200).json(new Response(true,newValidUser));
+            }else if(editingInfo === 'password'){
+                const {password} = req.body;
             }
 
-        }else if(editingInfo === 'username'){
-            const {username} = req.body;
-            const spacesValidation = /\s/;
-            const thereIsAnError = username === validUser.username || username.length === 0 || (spacesValidation.test(username));
-            if(thereIsAnError){
-                // error handling 
-                const ErrorsList = new ErrorEditing('email');
-
-                if((spacesValidation.test(username))){
-                    ErrorsList.addErrorMessage('please enter a valid username that do not contain spaces');
-                }
-                if(username === validUser.username){
-                    ErrorsList.addErrorMessage('your username cannot be the same as the previous ');
-                }
-                if(username.length === 0){
-                    ErrorsList.addErrorMessage('Please write the username that you want to edit');
-                }
-                res.status(400).json(new Error({emailErrorMessage:ErrorsList.ErrorMessage}));
-            }else{
-                let newValidUser = await validUser;
-                newValidUser.username = username;
-                const newUserTable = usableUserTable.map(user =>{if(user.UserID === UserID){return newValidUser;}return user});
-                //saving data to the db 
-                await writeDataBase('./db/UserFiles/Users.json',JSON.stringify(newUserTable),'utf-8');
-                //
-                // saving the login to the logs 
-                let logsMessage = `${req.time} User edited his username => UserID : ${validUser.UserID}`;
-                let oldDb = await readDataBase('./db/logs/UsersLogs.log','utf-8');
-                logsMessage = await `${logsMessage} \n${oldDb}`;
-                await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
-                //
-
-                res.status(200).json(new Response(true,newValidUser));
-            
-            }
-        }else if(editingInfo === 'password'){
-            const {password} = req.body;
+        }else{
+            res.status(405).json(new Error('user was not found'));
         }
-
-    }else{
-        res.status(405).json(new Error('user was not found'));
+    }
+    catch(error){
+        console.log(error)
     }
 }
 
-const editEmail = ()=>{
+const editData = async (res,req,thereIsAnError,errorList,validUser,editingdata,editingInfo,UserID,usableUserTable)=>{
+    if(thereIsAnError){
+        // error handling 
+        const ErrorsList = new ErrorEditing('email');
+
+        if(errorList.firstError){
+            ErrorsList.addErrorMessage(errorList.firstErrorMessage);
+        }
+        if(errorList.secondError){
+            ErrorsList.addErrorMessage(errorList.secondErrorMessage);
+        }
+        if(errorList.thirdError){
+            ErrorsList.addErrorMessage(errorList.thirdErrorMessage);
+        }
+        res.status(400).json(new Error({emailErrorMessage:ErrorsList.ErrorMessage}));
+    }else{
+
+        //choosing the editing mode 
+        let newValidUser = await validUser;
+        if(editingInfo === 'username'){
+            newValidUser.username = editingdata;
+        }else if(editingInfo === "email"){
+            newValidUser.email = EncryptedData(editingdata,'EMAIL_HASHING');
+        }else if(editingInfo === "password"){
+            newValidUser.password = EncryptedData(editingdata   ,'PASSWORD_HASING');
+        }
+        // creating a new added table 
+        const newUserTable = usableUserTable.map(user =>{if(user.UserID === UserID){return newValidUser;}return user});
+        //saving data to the db 
+        await writeDataBase('./db/UserFiles/Users.json',JSON.stringify(newUserTable),'utf-8');
+        //
+        // saving the action to the logs 
+        let logsMessage = `${req.time} User edited his username => UserID : ${validUser.UserID}`;
+        let oldDb = await readDataBase('./db/logs/UsersLogs.log','utf-8');
+        logsMessage = await `${logsMessage} \n${oldDb}`;
+        await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+        //
+
+        res.status(200).json(new Response(true,newValidUser));
     
+    }
 }
 module.exports = {editInfo}
-
-
