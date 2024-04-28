@@ -45,6 +45,17 @@ const editInfo = async (req,res) =>{
 
             }else if(editingInfo === 'password'){
                 const {password} = req.body;
+                const thereIsAnError = password === EncryptedData(validUser.password,'PASSWORD_HASING') || password.length === 0 || password.length <6;
+                const errorList = {
+                    firstError:password.length <6,
+                    firstErrorMessage:'please enter a valid password that is more than 6 characters',
+                    secondError:password === EncryptedData(validUser.password,'PASSWORD_HASING') ,
+                    secondErrorMessage:'your password cannot be the same as the previous ',
+                    thirdError:password.length === 0,
+                    thirdErrorMessage:'Please write the username that you want to edit'
+                };
+                await editData(res,req,thereIsAnError,errorList,validUser,password,'password',UserID,usableUserTable);
+
             }
 
         }else{
