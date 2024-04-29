@@ -109,4 +109,20 @@ const editData = async (res,req,thereIsAnError,errorList,validUser,editingdata,e
     
     }
 }
+
+const showDataToProfile = async (req,res)=>{
+    const {UserID} = req.query;
+    const UserDataBase = await readDataBase('./db/UserFiles/Users.json');
+    const usableUserTable = await JSON.parse(UserDataBase);
+    const User = usableUserTable.find(user => user.UserID === UserID);
+    if(User){
+        res.status(200).json(new Response(true,User));
+    }
+    else{
+        res.status(404).json(new Error('error 404 user not found '));
+        
+    }
+
+    
+}
 module.exports = {editInfo}
