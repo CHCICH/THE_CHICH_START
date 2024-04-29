@@ -120,9 +120,10 @@ const showDataToProfile = async (req,res)=>{
     }
     else{
         res.status(404).json(new Error('error 404 user not found '));
-        
+
     }
 
     
 }
 module.exports = {editInfo}
+
