@@ -8,15 +8,17 @@ const {Error,SignInError} = require('../errors/Error');
 
 const LogIn = async (req,res)=>{
     
-    const readDataBase = await readTables('./db/UserFiles/Users.json','utf-8');
-    let DataUsersTable = await JSON.parse(readDataBase);
-    const {UsernameOrEmail,password} = req.body;
-    const encryptedUser = EncryptedData(UsernameOrEmail,'EMAIL_HASHING');
-    let isUserTrue = await DataUsersTable.find(user => (user.email === encryptedUser) || (user.username === UsernameOrEmail));
-    let passwordEnterdEncrypted = EncryptedData(password,'PASSWORD_HASING');
-    const SignInErrors = new SignInError(!isUserTrue,UsernameOrEmail.length === 0, password.length === 0,( isUserTrue ? isUserTrue.password !== passwordEnterdEncrypted : true));
-
+    
     try {
+        const readDataBase = await readTables('./db/UserFiles/Users.json','utf-8');
+        let DataUsersTable = await JSON.parse(readDataBase);
+        const {UsernameOrEmail,password} = req.body;
+        const encryptedUser = EncryptedData(UsernameOrEmail,'EMAIL_HASHING');
+        let isUserTrue = await DataUsersTable.find(user => (user.email === encryptedUser) || (user.username === UsernameOrEmail));
+        let passwordEnterdEncrypted = EncryptedData(password,'PASSWORD_HASING');
+        const SignInErrors = new SignInError(!isUserTrue,UsernameOrEmail.length === 0, password.length === 0,( isUserTrue ? isUserTrue.password !== passwordEnterdEncrypted : true));
+
+
         if(SignInErrors.EmailOrUsernameIsEmpty || SignInErrors.emailOrUsernameNotFound || SignInErrors.passwordIsEmpty){
             //email or username error
             if(SignInErrors.emailOrUsernameNotFound){
@@ -56,7 +58,8 @@ const LogIn = async (req,res)=>{
         }
     }
     catch(err){
-        console.log(err)
+        res.status(400).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
+
     }
     
 }

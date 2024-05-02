@@ -9,12 +9,12 @@ const {Response} = require('../models/DataModels/UserDataModel');
 
 
 const editInfo = async (req,res) =>{
-    const {editingInfo, UserID} = req.query;
-    const readUserTable = await readDataBase('./db/UserFiles/Users.json','utf-8');
-    const usableUserTable = JSON.parse(readUserTable);
-    const validUser = usableUserTable.find(user => user.UserID === UserID);
-    console.log(req.query)
     try{
+        const {editingInfo, UserID} = req.query;
+        const readUserTable = await readDataBase('./db/UserFiles/Users.json','utf-8');
+        const usableUserTable = JSON.parse(readUserTable);
+        const validUser = usableUserTable.find(user => user.UserID === UserID);
+        
         if(validUser){
             if(editingInfo === 'email'){
                 const {newEmail} = req.body;
@@ -63,7 +63,7 @@ const editInfo = async (req,res) =>{
         }
     }
     catch(error){
-        console.log(error)
+        res.status(400).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
     }
 }
 

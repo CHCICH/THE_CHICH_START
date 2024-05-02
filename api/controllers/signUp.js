@@ -75,7 +75,8 @@ const createAccount = async (req,res)=>{
         }
     }
     catch(error){
-        console.log(error);
+        res.status(400).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
+
     }
 }
 
