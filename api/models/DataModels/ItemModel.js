@@ -10,6 +10,9 @@ class Item{
         this.imageOftheItem = imageOftheItem;
         this.ItemID = uniqid();
     }
+    editItemIDtoDefault(ItemID){
+        this.ItemID = ItemID
+    }
 }
 
 module.exports = {Item};
