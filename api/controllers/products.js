@@ -8,19 +8,19 @@ const {Error} = require('../errors/Error')
 
 
 const createNewItem = async (req,res)=>{
-    const {UserID,NameOfTheItem, price,descOftheItem, imageOftheItem} = req.body;
-    const userTable = await readTables('./db/UserFiles/Users.json');
-    const usableUserTable = await JSON.stringify(userTable);
-    const UserExists = usableUserTable.find(user => user.UserID === UserID);
-    const ErrorList = {
-        NameIsEmpty : NameOfTheItem.length === 0,
-        NameIsTooShort : NameOfTheItem.length < 5,
-        priceIsEmpty: price.length === 0,
-        priceIsaUsableNumber : `${Number(price)}` !== price
-    }
-    const thereIsAnError = ErrorList.NameIsEmpty || ErrorList.NameIsTooShort || ErrorList.priceIsEmpty || ErrorList.priceIsaUsableNumber;
-
+    
     try{
+        const {UserID,NameOfTheItem, price,descOftheItem, imageOftheItem} = req.body;
+        const userTable = await readTables('./db/UserFiles/Users.json');
+        const usableUserTable = await JSON.parse(userTable);
+        const UserExists = usableUserTable.find(user => user.UserID === UserID);
+        const ErrorList = {
+            NameIsEmpty : NameOfTheItem.length === 0,
+            NameIsTooShort : NameOfTheItem.length < 5,
+            priceIsEmpty: price.length === 0,
+            priceIsaUsableNumber : `${Number(price)}` !== price
+        }
+        const thereIsAnError = ErrorList.NameIsEmpty || ErrorList.NameIsTooShort || ErrorList.priceIsEmpty || ErrorList.priceIsaUsableNumber;
         if(UserExists){
             if(thereIsAnError){
                 //error handling

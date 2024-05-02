@@ -3,7 +3,7 @@ const productRouter = express.Router();
 const {createNewItem} = require('../controllers/products');
 
 
-productRouter.post('/newitem',createNewItem);
+productRouter.post('/',createNewItem);
 
 module.exports = productRouter;
 

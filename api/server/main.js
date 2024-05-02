@@ -12,11 +12,11 @@ app.use(DateForLog)
 //routes
 
 app.use('/',pageRouter);
-app.use('api/login', LoginRouter);
-app.use('api/cart', CartRouter);
-app.use('api/user',UserDataRouter);
-app.use('api/signup',SignUpRouter)
-app.use('api/item',productRouter);
+app.use('/api/login', LoginRouter);
+app.use('/api/cart', CartRouter);
+app.use('/api/user',UserDataRouter);
+app.use('/api/signup',SignUpRouter)
+app.use('/api/item',productRouter);
 //
 
 app.listen(SERVER_PORT, async ()=>{
