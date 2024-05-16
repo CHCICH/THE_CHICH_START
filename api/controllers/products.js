@@ -4,7 +4,7 @@ const {readFile,writeFile} = require('fs');
 const utils = require('util');
 const readTables = utils.promisify(readFile);
 const writeDataBase = utils.promisify(writeFile);
-const {Error} = require('../errors/Error')
+const {Error} = require('../errors/Error');
 
 
 const createNewItem = async (req,res)=>{
@@ -138,7 +138,32 @@ const editItem = async (req,res) =>{
         res.status(400).json(new Error(`An unexpected error occurer error type ${error}`));
     }
 }
-
+const deleteItem = async (req,res) =>{
+    try{
+        const {UserID,ItemID} = req.body;
+        const ItemsTable = await readTables('./db/UserFiles/items.json','utf-8');
+        const usableItemsTable = await JSON.parse(ItemsTable);
+        const ValidItem = usableItemsTable.find(item => item.ItemID === ItemID);
+        if(ValidItem.AuthorUserID === UserID){
+            const newItemTable = usableItemsTable;
+            const filteredTable = newItemTable.filter(item => item.ItemID !== ItemID);
+            const stringifiedFilteredTable = JSON.stringify(filteredTable);
+            await writeDataBase('./db/UserFiles/items.json',stringifiedFilteredTable,'utf-8');
+            // saving the login to the logs 
+            let logsMessage = `${req.time} User edited the item => UserID : ${UserID} , ItemID : ${ItemID}`;
+            let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
+            logsMessage = await `${logsMessage} \n${oldDb}`;
+            await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+            //
+            res.status(200).json(new Response(true,{msg: "the Item as been successfully deleted"}));
+        }else{
+            res.status(400).json(new Error("User can only delete it's own posts"));
+        }
+    }
+    catch(error){
+        res.status(400).json(new Error(`An unexpected error occurerd => error type ${error}`));
+    }
+        
+}
  
-
-module.exports = {createNewItem,editItem};
+module.exports = {createNewItem,editItem,deleteItem};
