@@ -165,5 +165,33 @@ const deleteItem = async (req,res) =>{
     }
         
 }
- 
-module.exports = {createNewItem,editItem,deleteItem};
+
+
+const deleteAllItems = async (req,res) =>{
+    //if the user exists 
+    try{
+        const userTable = await readTables('./db/UserFiles/Users.json');
+        const usableUserTable = await JSON.parse(userTable);
+        const UserExists = usableUserTable.find(user => user.UserID === UserID);
+        if(UserExists){
+            const {UserID} = req.body;
+            const ItemTables = await readTables('./db/UserFiles/items.json','utf-8');
+            const usableTable = await JSON.parse(ItemTables);
+            const filteredTable = await usableTable.filter(({AuthorUserID}) => AuthorUserID !== UserID);
+            await writeDataBase('./db/UserFiles/items.json',JSON.stringify(filteredTable),"utf-8");
+        
+            // saving the login to the logs 
+            let logsMessage = `${req.time} User deleted all his items => UserID : ${UserID} `;
+            let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
+            logsMessage = await `${logsMessage} \n${oldDb}`;
+            await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+            //
+            res.status(200).json(new Response(true,{msg:"the data has been successfully deleted", prevData:usableTable, newData:filteredTable}));
+        }else{
+            res.status(400).json(new Error('the User do not exists'));
+        }
+    }catch (error){
+        res.status(400).json(new Error(`An unexpected error occurerd => error type ${error}`));
+    }
+}
+module.exports = {createNewItem,editItem,deleteItem,deleteAllItems};
