@@ -4,8 +4,11 @@ const SERVER_PORT = 5000;
 const {LoginRouter, CartRouter,pageRouter,UserDataRouter, SignUpRouter, productRouter} = require('../routes/MainRoute');
 const {directTothepath} = require('../utils/direction');
 const {DateForLog} = require('../middleware/Logs');
+const cors = require('cors')
+
 //other middlewares
 
+app.use(cors())
 app.use(express.static(directTothepath(__dirname,"PUBLIC_STATIC")+'front-end'));
 app.use(express.json());
 app.use(DateForLog)
