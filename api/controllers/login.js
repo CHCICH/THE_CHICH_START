@@ -10,9 +10,9 @@ const LogIn = async (req,res)=>{
     
     
     try {
-        const readDataBase = await readTables('./db/UserFiles/Users.json','utf-8');
+        const readDataBase = await readTables('../db/UserFiles/Users.json','utf-8');
         let DataUsersTable = await JSON.parse(readDataBase);
-        const {UsernameOrEmail,password} = req.body;
+        const {UsernameOrEmail,password} = req.query;
         const encryptedUser = EncryptedData(UsernameOrEmail,'EMAIL_HASHING');
         let isUserTrue = await DataUsersTable.find(user => (user.email === encryptedUser) || (user.username === UsernameOrEmail));
         let passwordEnterdEncrypted = EncryptedData(password,'PASSWORD_HASING');
@@ -33,14 +33,14 @@ const LogIn = async (req,res)=>{
                 SignInErrors.addPasswordMessage("Please enter your password");
             }
             //
-            res.status(400).json(new Error({emailOrUsernameError:SignInErrors.UsernameOrEmailErrorMessage, passwordErrror:SignInErrors.PasswordErrorMessage}))
+            res.status(200).json(new Error({emailOrUsernameError:SignInErrors.UsernameOrEmailErrorMessage, PasswordError:SignInErrors.PasswordErrorMessage}))
         }else if(isUserTrue){
             
             if(SignInErrors.wrongPassword){
                 if(password.length === 0 ){
-                    res.status(400).json(new Error({PasswordError:"Please type your password"}))
+                    res.status(200).json(new Error({PasswordError:"Please type your password"}))
                 }else{
-                    res.status(400).json(new Error({PasswordError:"wrong password please write a valid password"}));
+                    res.status(200).json(new Error({PasswordError:"wrong password please write a valid password"}));
                 }
             }
 
@@ -48,9 +48,9 @@ const LogIn = async (req,res)=>{
 
                 // saving the login to the logs 
                 let logsMessage = `${req.time} User logged Into his account => UserID : ${isUserTrue.UserID}`;
-                let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
+                let oldDb = await readTables('../db/logs/UsersLogs.log','utf-8');
                 logsMessage = await `${logsMessage} \n${oldDb}`;
-                await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+                await writeDataBase('../db/logs/UsersLogs.log', logsMessage, 'utf-8');
                 //
                 res.status(200).json(new Response(true,new UserID(isUserTrue.UserID, isUserTrue.userSecret,'User was succesfully logged in')));
 
@@ -58,7 +58,7 @@ const LogIn = async (req,res)=>{
         }
     }
     catch(err){
-        res.status(400).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
+        res.status(200).json(new Error(`an Unexpected Errror Occuered Error type: ${err}`));
 
     }
     
