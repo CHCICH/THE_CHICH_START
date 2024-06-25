@@ -49,7 +49,7 @@ const createAccount = async (req,res)=>{
                 ErrorList.addPasswordMessage("Please fill in the password to sign up");
             }
 
-            res.status(401).json(new Error({emailError: ErrorList.EmailErrorMessage, usernameError :ErrorList.UsernameErrorMessage ,passwordError:ErrorList.PasswordErrorMessage}));
+            res.status(200).json(new Error({emailError: ErrorList.EmailErrorMessage, usernameError :ErrorList.UsernameErrorMessage ,passwordError:ErrorList.PasswordErrorMessage}));
 
         }
         
@@ -70,7 +70,7 @@ const createAccount = async (req,res)=>{
         }
     }
     catch(error){
-        res.status(400).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
+        res.status(200).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
 
     }
 }
