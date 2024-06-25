@@ -6,12 +6,13 @@ const {EncryptedData} = require('../models/EncryptData/de-encrypt');
 const {ErrorEditing,Error} = require('../errors/Error');
 const validator = require('email-validator');
 const {Response} = require('../models/DataModels/UserDataModel');
+const {logging} = require('../utils/logging');
 
 
 const editInfo = async (req,res) =>{
     try{
         const {editingInfo, UserID} = req.query;
-        const readUserTable = await readDataBase('./db/UserFiles/Users.json','utf-8');
+        const readUserTable = await readDataBase('../db/UserFiles/Users.json','utf-8');
         const usableUserTable = JSON.parse(readUserTable);
         const validUser = usableUserTable.find(user => user.UserID === UserID);
         
@@ -96,14 +97,10 @@ const editData = async (res,req,thereIsAnError,errorList,validUser,editingdata,e
         // creating a new added table 
         const newUserTable = usableUserTable.map(user =>{if(user.UserID === UserID){return newValidUser;}return user});
         //saving data to the db 
-        await writeDataBase('./db/UserFiles/Users.json',JSON.stringify(newUserTable),'utf-8');
-        //
-        // saving the action to the logs 
-        let logsMessage = `${req.time} User edited his username => UserID : ${validUser.UserID}`;
-        let oldDb = await readDataBase('./db/logs/UsersLogs.log','utf-8');
-        logsMessage = await `${logsMessage} \n${oldDb}`;
-        await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
-        //
+        await writeDataBase('../db/UserFiles/Users.json',JSON.stringify(newUserTable),'utf-8');
+        //saving to the logs
+        await logging(req.time,{UserID:validUser.UserID},'../db/logs/UsersLogs.log','EDIT_USER_DATA')
+
 
         res.status(200).json(new Response(true,newValidUser));
     
@@ -112,7 +109,7 @@ const editData = async (res,req,thereIsAnError,errorList,validUser,editingdata,e
 
 const showDataToProfile = async (req,res)=>{
     const {UserID} = req.query;
-    const UserDataBase = await readDataBase('./db/UserFiles/Users.json');
+    const UserDataBase = await readDataBase('../db/UserFiles/Users.json');
     const usableUserTable = await JSON.parse(UserDataBase);
     const User = usableUserTable.find(user => user.UserID === UserID);
     if(User){

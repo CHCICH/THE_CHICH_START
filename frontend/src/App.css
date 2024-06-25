@@ -57,6 +57,8 @@
 
 a{
   cursor: pointer;
+  color: rgb(164, 164, 210);
+  text-decoration: underline rgb(164, 164, 210);
 }
 .danger_error{
   color:red;

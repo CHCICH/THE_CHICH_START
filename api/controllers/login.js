@@ -5,6 +5,8 @@ const utils = require('util');
 const readTables = utils.promisify(readFile);
 const writeDataBase = utils.promisify(writeFile);
 const {Error,SignInError} = require('../errors/Error');
+const {logging} = require('../utils/logging');
+
 
 const LogIn = async (req,res)=>{
     
@@ -45,13 +47,9 @@ const LogIn = async (req,res)=>{
             }
 
             else if(isUserTrue.password === passwordEnterdEncrypted){
+                //saving to the logs
+                await logging(req.time,{UserID:isUserTrue.UserID},'../db/logs/UsersLogs.log','LOGIN')
 
-                // saving the login to the logs 
-                let logsMessage = `${req.time} User logged Into his account => UserID : ${isUserTrue.UserID}`;
-                let oldDb = await readTables('../db/logs/UsersLogs.log','utf-8');
-                logsMessage = await `${logsMessage} \n${oldDb}`;
-                await writeDataBase('../db/logs/UsersLogs.log', logsMessage, 'utf-8');
-                //
                 res.status(200).json(new Response(true,new UserID(isUserTrue.UserID, isUserTrue.userSecret,'User was succesfully logged in')));
 
             }

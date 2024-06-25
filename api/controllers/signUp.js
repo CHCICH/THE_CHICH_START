@@ -6,13 +6,14 @@ const util = require('util')
 const readDataBase = util.promisify(readFile);
 const writeDataBase = util.promisify(writeFile);
 const {EncryptedData} = require('../models/EncryptData/de-encrypt');
+const {logging} = require('../utils/logging');
 
 
 const spacesValidation = /\s/;
 const createAccount = async (req,res)=>{
     try {
         let {newEmail, newUsername, password } = req.body;
-        let AcctualUserTable = await readDataBase('./db/UserFiles/Users.json','utf-8');
+        let AcctualUserTable = await readDataBase('../db/UserFiles/Users.json','utf-8');
         let ParsedAcctualUserTable = await JSON.parse(AcctualUserTable);
         let EmailAlreadyExists = await ParsedAcctualUserTable.find(({email}) => email === EncryptedData(newEmail,'EMAIL_HASHING'));
         let UserNameAlreadyExists = await ParsedAcctualUserTable.find(({username}) => username === newUsername);
@@ -59,16 +60,10 @@ const createAccount = async (req,res)=>{
             await UserInformation.createSecret();
             await ParsedAcctualUserTable.push(UserInformation);
             let FinalUserTable = await JSON.stringify(ParsedAcctualUserTable);
-            await writeDataBase('./db/UserFiles/Users.json',FinalUserTable,'utf-8');
+            await writeDataBase('../db/UserFiles/Users.json',FinalUserTable,'utf-8');
             
-            //
-
-            //save to the logs 
-
-            let logsMessage = `${req.time} new User was Created => UserID : ${UserInformation.UserID}`;
-            let oldDb = await readDataBase('./db/logs/UsersLogs.log','utf-8');
-            logsMessage = await `${logsMessage} \n${oldDb}`;
-            await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+            //saving to the logs 
+            await logging(req.time,{UserID:UserInformation.UserID},'../db/logs/UsersLogs.log','SIGN_UP')
 
             //
             res.status(200).json(new Response(true,new UserID(UserInformation.UserID,UserInformation.userSecret,'User was succesfully saved and registered')))

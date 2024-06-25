@@ -5,13 +5,13 @@ const utils = require('util');
 const readTables = utils.promisify(readFile);
 const writeDataBase = utils.promisify(writeFile);
 const {Error} = require('../errors/Error');
-
+const {logging} = require('../utils/logging');
 
 const createNewItem = async (req,res)=>{
     
     try{
         const {UserID,NameOfTheItem, price,descOftheItem, imageOftheItem} = req.body;
-        const userTable = await readTables('./db/UserFiles/Users.json');
+        const userTable = await readTables('../db/UserFiles/Users.json');
         const usableUserTable = await JSON.parse(userTable);
         const UserExists = usableUserTable.find(user => user.UserID === UserID);
         const ErrorList = {
@@ -42,17 +42,13 @@ const createNewItem = async (req,res)=>{
             }else{
                 // saving to the items tables 
                 const newItem = new Item(UserID,NameOfTheItem,price,descOftheItem,imageOftheItem);
-                const itemsTable = await readTables('./db/UserFiles/items.json','utf-8');
+                const itemsTable = await readTables('../db/UserFiles/items.json','utf-8');
                 const usableItemsTable = await JSON.parse(itemsTable);
                 await usableItemsTable.push(newItem);
                 const finalItemTable = await JSON.stringify(usableItemsTable);
-                await writeDataBase('./db/UserFiles/items.json',finalItemTable,'utf-8');
-                //
-                // saving the login to the logs 
-                let logsMessage = `${req.time} User created an item => UserID : ${UserExists.UserID} , ItemID : ${newItem.ItemID}`;
-                let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
-                logsMessage = await `${logsMessage} \n${oldDb}`;
-                await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
+                await writeDataBase('../db/UserFiles/items.json',finalItemTable,'utf-8');
+                //saving to the logs
+                await logging(req.time,{UserID:UserID,ItemID:newItem.ItemID},'../db/logs/UsersLogs.log','CREATE_ITEM')
                 //
                 res.status(200).json(new Response(true,newItem))
             }
@@ -70,7 +66,7 @@ const editItem = async (req,res) =>{
     try{
         const {name, price, desc,image,UserID} = req.body;
         const {ItemID} = req.params;
-        const ItemsTable = await readTables('./db/UserFiles/items.json','utf-8');
+        const ItemsTable = await readTables('../db/UserFiles/items.json','utf-8');
         const usableItemsTable = await JSON.parse(ItemsTable);
         const ValidItem = usableItemsTable.find(item => item.ItemID === ItemID);
 
@@ -114,14 +110,11 @@ const editItem = async (req,res) =>{
                         return item
                     });
                     const newFinalItemsTable = JSON.stringify(newItemsTable);
-                    await writeDataBase('./db/UserFiles/items.json',newFinalItemsTable,'utf-8');
-                    //
-                    // saving the login to the logs 
-                    let logsMessage = `${req.time} User edited the item => UserID : ${UserID} , ItemID : ${ItemID}`;
-                    let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
-                    logsMessage = await `${logsMessage} \n${oldDb}`;
-                    await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
-                    //
+                    await writeDataBase('../db/UserFiles/items.json',newFinalItemsTable,'utf-8');
+
+                    //saving to the logs
+                    await logging(req.time,{UserID:UserID,ItemID:newItem.ItemID},'../db/logs/UsersLogs.log','EDIT_ITEM')
+
                     const finalResponse = new Item(ValidItem.AuthorUserID,name,price,desc,image);
                     finalResponse.editItemIDtoDefault(ItemID);
                     res.status(200).json(new Response(true,finalResponse));
@@ -141,20 +134,18 @@ const editItem = async (req,res) =>{
 const deleteItem = async (req,res) =>{
     try{
         const {UserID,ItemID} = req.body;
-        const ItemsTable = await readTables('./db/UserFiles/items.json','utf-8');
+        const ItemsTable = await readTables('../db/UserFiles/items.json','utf-8');
         const usableItemsTable = await JSON.parse(ItemsTable);
         const ValidItem = usableItemsTable.find(item => item.ItemID === ItemID);
         if(ValidItem.AuthorUserID === UserID){
             const newItemTable = usableItemsTable;
             const filteredTable = newItemTable.filter(item => item.ItemID !== ItemID);
             const stringifiedFilteredTable = JSON.stringify(filteredTable);
-            await writeDataBase('./db/UserFiles/items.json',stringifiedFilteredTable,'utf-8');
-            // saving the login to the logs 
-            let logsMessage = `${req.time} User edited the item => UserID : ${UserID} , ItemID : ${ItemID}`;
-            let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
-            logsMessage = await `${logsMessage} \n${oldDb}`;
-            await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
-            //
+            await writeDataBase('../db/UserFiles/items.json',stringifiedFilteredTable,'utf-8');
+            //saving to the logs 
+            await logging(req.time,{UserID:UserID,ItemID:newItem.ItemID},'../db/logs/UsersLogs.log','DELETE_ITEM')
+
+
             res.status(200).json(new Response(true,{msg: "the Item as been successfully deleted"}));
         }else{
             res.status(400).json(new Error("User can only delete it's own posts"));
@@ -170,22 +161,18 @@ const deleteItem = async (req,res) =>{
 const deleteAllItems = async (req,res) =>{
     //if the user exists 
     try{
-        const userTable = await readTables('./db/UserFiles/Users.json');
+        const userTable = await readTables('../db/UserFiles/Users.json');
         const usableUserTable = await JSON.parse(userTable);
         const UserExists = usableUserTable.find(user => user.UserID === UserID);
         if(UserExists){
             const {UserID} = req.body;
-            const ItemTables = await readTables('./db/UserFiles/items.json','utf-8');
+            const ItemTables = await readTables('../db/UserFiles/items.json','utf-8');
             const usableTable = await JSON.parse(ItemTables);
             const filteredTable = await usableTable.filter(({AuthorUserID}) => AuthorUserID !== UserID);
-            await writeDataBase('./db/UserFiles/items.json',JSON.stringify(filteredTable),"utf-8");
-        
-            // saving the login to the logs 
-            let logsMessage = `${req.time} User deleted all his items => UserID : ${UserID} `;
-            let oldDb = await readTables('./db/logs/UsersLogs.log','utf-8');
-            logsMessage = await `${logsMessage} \n${oldDb}`;
-            await writeDataBase('./db/logs/UsersLogs.log', logsMessage, 'utf-8');
-            //
+            await writeDataBase('../db/UserFiles/items.json',JSON.stringify(filteredTable),"utf-8");
+            //saving to the logs 
+            await logging(req.time,{UserID:UserID,ItemID:newItem.ItemID},'../db/logs/UsersLogs.log','DELETE_ALL_ITEM')
+
             res.status(200).json(new Response(true,{msg:"the data has been successfully deleted", prevData:usableTable, newData:filteredTable}));
         }else{
             res.status(400).json(new Error('the User do not exists'));
