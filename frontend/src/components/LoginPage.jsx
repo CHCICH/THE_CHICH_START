@@ -59,7 +59,7 @@ const SignUpComponent = ({error,inputValues,setInputValues,Login,UserHasAnAccoun
 
     <button className='inputholder' onClick={()=>Login(inputValues.username,inputValues.password)}>Log in</button>
 
-    <p>don't have an account ? <a onClick={()=>{setUserHasAnAccount(false)}}>Sign Up</a></p>
+    <p>don't have an account ? <a onClick={()=>{setUserHasAnAccount(true)}}>Sign Up</a></p>
   </div>
   )
 }
