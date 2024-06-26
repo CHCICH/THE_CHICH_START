@@ -181,4 +181,98 @@ const deleteAllItems = async (req,res) =>{
         res.status(202).json(new Error(`An unexpected error occurerd => error type ${error}`));
     }
 }
-module.exports = {createNewItem,editItem,deleteItem,deleteAllItems};
+
+const showProductsOfUser = async (req,res)=>{
+    try{
+        const {UserID} = req.query;
+        const UserDB = await readTables('../db/UserFiles/Users.json','utf-8');
+        const isUserValid = await (JSON.parse(UserDB)).find(item => item.UserID === UserID);
+        if(isUserValid){
+            const ItemsDB = await readTables('../db/UserFiles/items.json','utf-8');
+            const itemList =  await (JSON.parse(ItemsDB)).filter(item => item.AuthorUserID === UserID);
+            if(itemList.length === 0){
+                res.status(200).json(new Response(true,{itemList:[],message:"the User do not have any item"}));
+            }else{
+                res.status(200).json(new Response(true,{itemList:itemList,message:"Item List was sent successfully"}))
+            }
+        }else{
+            res.status(202).json(new Error("User do not exist thus there is no item availble"));
+        }
+    }catch(error){
+        res.status(202).json(new Error("unexpected error occured"+error))
+    }
+}
+
+const FeedNumber = (screenWidth,screenHeigth,feedSizeWidth,feedSizeHeight)=>{
+    const widthRatio = screenWidth/feedSizeHeight;
+    const heightRatio = screenHeigth/feedSizeHeight;
+    const comparison = widthRatio > heightRatio ? Math.floor(heightRatio) : Math.floor(widthRatio);
+    if (comparison < 3){
+        return 3
+    }
+    return comparison ;
+
+}
+
+
+const showRandomFeed = async (req,res)=>{
+
+    try{
+
+        const {UserID ,RecomendedNumber, screenHeigth, screenWidth, feedSizeWidth,feedSizeHeight} = req.body;
+        const UserDB = await readTables('../db/UserFiles/Users.json','utf-8');
+        const isUserValid = await (JSON.parse(UserDB)).find(user => user.UserID === UserID);
+        if(isUserValid){
+
+            const ItemsDB = await readTables('../db/UserFiles/items.json','utf-8');
+            const filteredTable = await (JSON.parse(ItemsDB)).filter(item => item.AuthorUserID !== UserID);
+
+            //cho
+            let numberOfFeeds; 
+            if(RecomendedNumber){
+                if(RecomendedNumber < filteredTable.length){
+                    numberOfFeeds = RecomendedNumber;
+                }else{
+                    res.status(202).json(new Error("Please either enter your screen and box size or enter a recomendedNumber that is lower than the size of the db size : " + filteredTable.length));
+                }
+            }else if(feedSizeWidth && screenHeigth && screenWidth && feedSizeHeight){
+                numberOfFeeds = FeedNumber(screenWidth,screenHeigth,feedSizeWidth,feedSizeHeight);
+            }else{
+                res.status(202).json(new Error("you need to provide a recomended or a size to your feed"));
+            }
+
+            // choosing the random item in the feed it is not based on an interst algorithm only a random one
+            const randomFeedsArr = [...Array(filteredTable.length).keys()];
+            const newOfficalFeed = [];
+            console.log(randomFeedsArr);
+            console.log(filteredTable)
+            for (let i = 0 ; i < numberOfFeeds; i++){
+                if(randomFeedsArr.length > 0){
+                    const randomIndex =  Math.floor(Math.random()*(randomFeedsArr.length));
+                    newOfficalFeed.push(filteredTable[randomFeedsArr[randomIndex]]);
+                    randomFeedsArr.splice(randomIndex,1);
+                    console.log(newOfficalFeed);
+                    console.log(randomFeedsArr);
+                }
+
+            }
+            //
+            res.status(200).json(new Response(true, {feed:newOfficalFeed,UserID:UserID,message:"feed was successfully coded",lengthOftheFeed:newOfficalFeed.length}));
+    
+        }else{
+            res.status(202).json(new Error("User do not exist thus there is no item availble"));
+        }
+
+    }catch(error){
+        res.status(202).json(new Error("An unexpected error happened" + error));
+    }
+}
+
+
+module.exports = {createNewItem,editItem,deleteItem,deleteAllItems,showProductsOfUser,showRandomFeed};
+
+
+
+
+
+// x random diffrent numbers between 0 ; n-1 

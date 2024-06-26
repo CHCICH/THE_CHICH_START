@@ -122,6 +122,8 @@ const showDataToProfile = async (req,res)=>{
 
     
 }
+
+
 module.exports = {editInfo}
 
 // github.com/chich

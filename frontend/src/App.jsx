@@ -7,7 +7,7 @@ import MainPage from './components/MainPage';
 import Sell from './components/Sell';
 
 function App() {
-  const [userSecret, setUserSecret] = useState('1');
+  const [userSecret, setUserSecret] = useState('');
   const [UserID, setUserID] = useState('');
   const [Username , setUsername] = useState('');
   if(!userSecret){
