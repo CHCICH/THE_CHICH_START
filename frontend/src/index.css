@@ -7,7 +7,9 @@
   justify-content: center;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #030a3ca3;
+  background-image: radial-gradient(rgb(33, 33, 67) );
+  background: radial-gradient(ellipse at top, #030a3ca3, transparent),
+            radial-gradient(ellipse at bottom, #0c1c91, transparent);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,3 +22,4 @@ html{
   width: 100%;
   height:100%;
 }
+/* #030a3ca3; */

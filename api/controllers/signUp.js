@@ -66,7 +66,7 @@ const createAccount = async (req,res)=>{
             await logging(req.time,{UserID:UserInformation.UserID},'../db/logs/UsersLogs.log','SIGN_UP')
 
             //
-            res.status(200).json(new Response(true,new UserID(UserInformation.UserID,UserInformation.userSecret,'User was succesfully saved and registered')))
+            res.status(200).json(new Response(true,new UserID(UserInformation.UserID,UserInformation.userSecret,'User was succesfully saved and registered',UserInformation.username)))
         }
     }
     catch(error){

@@ -7,14 +7,15 @@ import MainPage from './components/MainPage';
 
 function App() {
   const [userSecret, setUserSecret] = useState('');
-  console.log(userSecret)
+  const [UserID, setUserID] = useState('');
+  const [Username , setUsername] = useState('');
   if(!userSecret){
     return(
-      <LoginPage setUserSecret={setUserSecret} />
+      <LoginPage setUsername={setUsername} setUserID={setUserID} setUserSecret={setUserSecret} />
     )
   }else{
     return(
-      <MainPage/>
+      <MainPage Username={Username} UserID={UserID} userSecret={userSecret}/>
     )
   }
 }

@@ -36,7 +36,7 @@ class Cart{
     }
     removeItemToCart(itemID){
         let NewCart = this.Cart;
-        NewCart.filter(item);
+        NewCart.filter(itemID);
     }
     
 }
@@ -48,9 +48,10 @@ class Response {
     }
 }
 class UserID{
-    constructor(UserID,userSecret,msg){
+    constructor(UserID,userSecret,msg,username){
         this.UserID = UserID;
         this.userSecret = userSecret;
+        this.username = username;
         this.msg = msg;
     }
 }

@@ -76,7 +76,7 @@ const SignUpComponent = ({SignUpError,SignUpInputValues,setSignUpInputValues,Sig
   )
 }
 
-const LoginPage = ({setUserSecret}) => {
+const LoginPage = ({setUserSecret,setUserID,setUsername}) => {
   const [SignUpError,setSignUpError ] = useState({error:false,emailError:'',passwordError:'',usernameError:''})
   const [LoginError, loginSetError] = useState({error:false,emailError:'',passworError:''});
   const [inputValues, setInputValues] = useState({username:'', password:''});
@@ -97,9 +97,12 @@ const LoginPage = ({setUserSecret}) => {
         }
     }
     axios.get("/api/login/", config).then(res => {
-    if(res.data.success){
+      if(res.data.success){
+      console.log(res.data);
       loginSetError({error:false,emailError:'',passworError:''});
-      setUserSecret(true);
+      setUserSecret(res.data.data.userSecret);
+      setUserID(res.data.data.UserID);
+      setUsername(res.data.data.username);
       
     }else{
       loginSetError({error:true,emailError:res.data.message.emailOrUsernameError,passworError:res.data.message.PasswordError})
@@ -122,8 +125,11 @@ const LoginPage = ({setUserSecret}) => {
     },config).then(res =>{
       console.log(res)
       if(res.data.success){
-      loginSetError({error:false,emailError:'',passwordError:'',usernameError:''});
-      setUserSecret(true);
+        loginSetError({error:false,emailError:'',passwordError:'',usernameError:''});
+        setUserSecret(res.data.data.userSecret);
+        setUserID(res.data.data.UserID);
+        setUsername(res.data.data.username);
+
       }else{
       setSignUpError({error:true ,emailError:res.data.message.emailError,passwordError:res.data.message.passwordError,usernameError:res.data.message.usernameError});
 
