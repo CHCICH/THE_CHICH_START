@@ -1,23 +1,13 @@
 import React from 'react'
 import './mainPage.css';
+import Header from './Header';
 
 const MainPage = ({userSecret,UserID,Username}) => {
 
   console.log(userSecret,UserID,Username);
   return (
     <div className="landing-page">
-        <header>
-          <div className="container">
-            <a href="" className="logo">THE <b>CHICH START</b></a>
-            <ul className="links">
-              <li>Home</li>
-              <li>Buy</li>
-              <li>Sell</li>
-              <li>Other</li>
-              <li>My Account</li>
-            </ul>
-          </div>
-        </header>
+       <Header/>
         <div className="content">
           <div className="container">
             <div className="info">

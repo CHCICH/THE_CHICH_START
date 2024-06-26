@@ -19,7 +19,6 @@ const LogIn = async (req,res)=>{
         let isUserTrue = await DataUsersTable.find(user => (user.email === encryptedUser) || (user.username === UsernameOrEmail));
         let passwordEnterdEncrypted = EncryptedData(password,'PASSWORD_HASING');
         const SignInErrors = new SignInError(!isUserTrue,UsernameOrEmail.length === 0, password.length === 0,( isUserTrue ? isUserTrue.password !== passwordEnterdEncrypted : true));
-        console.log(isUserTrue.username)
 
 
         if(SignInErrors.EmailOrUsernameIsEmpty || SignInErrors.emailOrUsernameNotFound || SignInErrors.passwordIsEmpty){

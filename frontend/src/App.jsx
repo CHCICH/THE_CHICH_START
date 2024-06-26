@@ -4,9 +4,10 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import LoginPage from './components/LoginPage';
 import MainPage from './components/MainPage';
+import Sell from './components/Sell';
 
 function App() {
-  const [userSecret, setUserSecret] = useState('');
+  const [userSecret, setUserSecret] = useState('1');
   const [UserID, setUserID] = useState('');
   const [Username , setUsername] = useState('');
   if(!userSecret){
@@ -15,7 +16,9 @@ function App() {
     )
   }else{
     return(
-      <MainPage Username={Username} UserID={UserID} userSecret={userSecret}/>
+      // <MainPage Username={Username} UserID={UserID} userSecret={userSecret}/>
+      <Sell UserID={UserID}/>
+
     )
   }
 }

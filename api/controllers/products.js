@@ -38,7 +38,7 @@ const createNewItem = async (req,res)=>{
                     listOfcurrentError.PriceErrorMessage = 'Please enter the price of your product';
                 }
 
-                res.status(400).json(new Error(listOfcurrentError))
+                res.status(202).json(new Error(listOfcurrentError))
             }else{
                 // saving to the items tables 
                 const newItem = new Item(UserID,NameOfTheItem,price,descOftheItem,imageOftheItem);
@@ -54,11 +54,11 @@ const createNewItem = async (req,res)=>{
             }
             
         }else{
-            res.status(404).json(new Error('User was not found'));
+            res.status(203).json(new Error('User was not found'));
         }
     }
     catch(error){
-        res.status(400).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
+        res.status(202).json(new Error(`an Unexpected Errror Occuered Error type: ${error}`));
     }
 
 }
@@ -96,7 +96,7 @@ const editItem = async (req,res) =>{
                         listOfcurrentError.PriceErrorMessage = 'Please enter the price of your product';
                     }
     
-                    res.status(400).json(new Error(listOfcurrentError))
+                    res.status(202).json(new Error(listOfcurrentError))
                 }else{
                     const newItemsTable = usableItemsTable.map(item => {
                         if(item.ItemID === ItemID){
@@ -120,15 +120,15 @@ const editItem = async (req,res) =>{
                     res.status(200).json(new Response(true,finalResponse));
                 }            
             }else{
-                res.status(404).json(new Error('Item was not found'))
+                res.status(203).json(new Error('Item was not found'))
             }
 
         }else{
-            res.status(400).json(new Error('Item only can be edited by its author'))
+            res.status(202).json(new Error('Item only can be edited by its author'))
         }
     }
     catch(error){
-        res.status(400).json(new Error(`An unexpected error occurer error type ${error}`));
+        res.status(202).json(new Error(`An unexpected error occurer error type ${error}`));
     }
 }
 const deleteItem = async (req,res) =>{
@@ -148,11 +148,11 @@ const deleteItem = async (req,res) =>{
 
             res.status(200).json(new Response(true,{msg: "the Item as been successfully deleted"}));
         }else{
-            res.status(400).json(new Error("User can only delete it's own posts"));
+            res.status(202).json(new Error("User can only delete it's own posts"));
         }
     }
     catch(error){
-        res.status(400).json(new Error(`An unexpected error occurerd => error type ${error}`));
+        res.status(202).json(new Error(`An unexpected error occurerd => error type ${error}`));
     }
         
 }
@@ -175,10 +175,10 @@ const deleteAllItems = async (req,res) =>{
 
             res.status(200).json(new Response(true,{msg:"the data has been successfully deleted", prevData:usableTable, newData:filteredTable}));
         }else{
-            res.status(400).json(new Error('the User do not exists'));
+            res.status(202).json(new Error('the User do not exists'));
         }
     }catch (error){
-        res.status(400).json(new Error(`An unexpected error occurerd => error type ${error}`));
+        res.status(202).json(new Error(`An unexpected error occurerd => error type ${error}`));
     }
 }
 module.exports = {createNewItem,editItem,deleteItem,deleteAllItems};
