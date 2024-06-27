@@ -2,34 +2,62 @@ import React, { useEffect, useState } from 'react'
 import './mainPage.css';
 import Header from './Header';
 import axios from 'axios';
+import Item from './Item';
+
 
 const Sell = ({UserID})=>{
-
+  
+    const [dataSaved, setDataSaved] = useState(false);
+    const [dataChanged, setDataChanged] = useState(false)
+    const [newFeed , setNewFeed ] = useState([]);
     useEffect(()=>{
-        // axios.get('/')
-    },[])
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        data:{},
+        params:{
+          UserID:UserID
+        }
+      }
+      axios.get('/api/item/showself',config).then(res =>{
+        if(newFeed.length === 0 ){
+          setNewFeed([...(res.data.data.itemList)]);
+        }else{
+          // console.log(res.data.data.itemList[res.data.data.itemList.length -1 ].ItemID !== newFeed[newFeed.length - 1].ItemID)
+          if(res.data.data.itemList[res.data.data.itemList.length -1 ].ItemID !== newFeed[newFeed.length - 1].ItemID){
+            setNewFeed([...newFeed,res.data.data.itemList[res.data.data.itemList.length - 1]])
+          }
+        }
+        }
+      ) 
+    },[dataChanged])
     const [CreatinInput,setCreatinInput ] = useState({name:'',desc:'',price:'',img:''});
-    const [dataSaved, setDataSaved] = useState(false)
 
 
   const createItem = (NameOfTheItem,price,descOftheItem,imageOftheItem)=>{
-    const config = {
+    const config = { 
       headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
       },
     }
+
+
+
     const body = {
       UserID:UserID,
       NameOfTheItem:CreatinInput.name,
       price:CreatinInput.price,
       descOftheItem:CreatinInput.desc,
-      imageOftheItem:CreatinInput.image
+      imageOftheItem:CreatinInput.img
     }
 
     axios.post('http://localhost:5000/api/item/create', body).then(res =>{
       if(res.data.success){
         setDataSaved(true);
+        setDataChanged(!dataChanged)
         setTimeout(()=>{
           setDataSaved(false);
         },2000)
@@ -37,7 +65,6 @@ const Sell = ({UserID})=>{
       console.log(res);
     })
   }
-
   return (
         <div className="landing-page">
             <Header/>
@@ -45,7 +72,17 @@ const Sell = ({UserID})=>{
               <div className="container">
                 <div className='ShopBox'>
                   <div className='ItemBox'>
+                    <h3>My Items</h3>
+                    <div className="ItemBos">
+
+                    {
+                      newFeed.map(item =>{
+                        return(<Item key={item.ItemID} Item={item} />)
+                      })
+                    }
+                    </div>
                   </div>
+                  {/*  */}
                   <div className='CreationItemBox'>
                     <h3>Create an Item</h3>
                     <div className='feedback-form'>
@@ -77,7 +114,7 @@ const Sell = ({UserID})=>{
                     </div>
                   </div>
                   </div>
-
+                  {/*  */}
                 </div>
                 </div>
             </div>

@@ -198,3 +198,38 @@
 .inputs::placeholder{
   color:rgb(86, 88, 94)
 }
+.SmallItem{
+  width:10rem;
+  height:10rem;
+  background-color: rgba(49, 11, 138, 0.712);
+  border-radius: 7px;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+
+}
+.ItemBox{
+  display: flex;
+  flex-direction:column;
+  /* /* scrollbar-color:rgba(32, 32, 90, 0.527) rgb(85, 88, 112) ; */
+  overflow-y: scroll;
+  width: 50%;
+}
+.ItemBos{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+::-webkit-scrollbar {
+  background: rgb(39, 53, 114);
+  scrollbar-width: thin; 
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(173, 150, 150, 0.455);
+  width:80px;
+  margin: 40px;
+  border-radius: 10px;
+  scrollbar-3dlight-color: #ffffff;
+  
+}

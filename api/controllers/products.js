@@ -190,6 +190,7 @@ const showProductsOfUser = async (req,res)=>{
         if(isUserValid){
             const ItemsDB = await readTables('../db/UserFiles/items.json','utf-8');
             const itemList =  await (JSON.parse(ItemsDB)).filter(item => item.AuthorUserID === UserID);
+            
             if(itemList.length === 0){
                 res.status(200).json(new Response(true,{itemList:[],message:"the User do not have any item"}));
             }else{
@@ -219,7 +220,7 @@ const showRandomFeed = async (req,res)=>{
 
     try{
 
-        const {UserID ,RecomendedNumber, screenHeigth, screenWidth, feedSizeWidth,feedSizeHeight} = req.body;
+        const {UserID ,RecomendedNumber, screenHeigth, screenWidth, feedSizeWidth,feedSizeHeight} = req.query;
         const UserDB = await readTables('../db/UserFiles/Users.json','utf-8');
         const isUserValid = await (JSON.parse(UserDB)).find(user => user.UserID === UserID);
         if(isUserValid){
