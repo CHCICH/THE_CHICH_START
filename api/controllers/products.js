@@ -133,22 +133,30 @@ const editItem = async (req,res) =>{
 }
 const deleteItem = async (req,res) =>{
     try{
-        const {UserID,ItemID} = req.body;
+        const {UserID,ItemID,Delete_Type} = req.body;
         const ItemsTable = await readTables('../db/UserFiles/items.json','utf-8');
         const usableItemsTable = await JSON.parse(ItemsTable);
         const ValidItem = usableItemsTable.find(item => item.ItemID === ItemID);
-        if(ValidItem.AuthorUserID === UserID){
-            const newItemTable = usableItemsTable;
-            const filteredTable = newItemTable.filter(item => item.ItemID !== ItemID);
-            const stringifiedFilteredTable = JSON.stringify(filteredTable);
-            await writeDataBase('../db/UserFiles/items.json',stringifiedFilteredTable,'utf-8');
-            //saving to the logs 
-            await logging(req.time,{UserID:UserID,ItemID:newItem.ItemID},'../db/logs/UsersLogs.log','DELETE_ITEM')
-
-
-            res.status(200).json(new Response(true,{msg: "the Item as been successfully deleted"}));
+        if(ValidItem){
+            if(ValidItem.AuthorUserID === UserID){
+                const newItemTable = usableItemsTable;
+                const filteredTable = newItemTable.filter(item => item.ItemID !== ItemID);
+                const stringifiedFilteredTable = JSON.stringify(filteredTable);
+                await writeDataBase('../db/UserFiles/items.json',stringifiedFilteredTable,'utf-8');
+                //saving to the logs 
+                await logging(req.time,{UserID:UserID,ItemID:ItemID},'../db/logs/UsersLogs.log','DELETE_ITEM');
+    
+                if(Delete_Type === 'USER_PRODUCT_DELETE'){
+                    const responseTable = filteredTable.filter(item => item.AuthorUserID === UserID);
+                    res.status(200).json(new Response(true, {msg:"the Item as been successfully deleted", ItemList:responseTable}));
+                }else{
+                    res.status(200).json(new Response(true,{msg: "the Item as been successfully deleted"}));
+                }
+            }else{
+                res.status(202).json(new Error("User can only delete it's own posts"));
+            }
         }else{
-            res.status(202).json(new Error("User can only delete it's own posts"));
+            res.status(202).json(new Error("item do not exist "));
         }
     }
     catch(error){
