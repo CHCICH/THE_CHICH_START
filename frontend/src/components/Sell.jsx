@@ -15,6 +15,7 @@ const Sell = ({UserID})=>{
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'x-authorization':"client_private_key123sdfj123jsdjnf12j"
         },
         data:{},
         params:{
@@ -41,6 +42,7 @@ const Sell = ({UserID})=>{
       headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'x-authorization':"client_private_key123sdfj123jsdjnf12j"
       },
     }
 
@@ -54,7 +56,7 @@ const Sell = ({UserID})=>{
       imageOftheItem:CreatinInput.img
     }
 
-    axios.post('http://localhost:5000/api/item/create', body).then(res =>{
+    axios.post('http://localhost:5000/api/item/create', body,config).then(res =>{
       if(res.data.success){
         setDataSaved(true);
         setDataChanged(!dataChanged)

@@ -22,6 +22,7 @@ const auth_101 = async (req,res,next)=>{
         }
         if(keysAreTheSame){
             const key_list = await readTables('../db/auth/authKey.json','utf-8');
+            console.log(current_api_key)
             const api_key_is_valid =(JSON.parse(key_list)).find(item => item === current_api_key);
             if (api_key_is_valid){
                 next();
