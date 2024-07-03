@@ -26,7 +26,7 @@ const Sell = ({UserID})=>{
           setNewFeed([...(res.data.data.itemList)]);
         }else{
           // console.log(res.data.data.itemList[res.data.data.itemList.length -1 ].ItemID !== newFeed[newFeed.length - 1].ItemID)
-          if(res.data.data.itemList[res.data.data.itemList.length -1 ].ItemID !== newFeed[newFeed.length - 1].ItemID){
+          if(res.data.data.itemList[res.data.data.itemList.length - 1 ].ItemID !== newFeed[newFeed.length - 1].ItemID){
             setNewFeed([...newFeed,res.data.data.itemList[res.data.data.itemList.length - 1]])
           }
         }
@@ -77,7 +77,7 @@ const Sell = ({UserID})=>{
 
                     {
                       newFeed.map(item =>{
-                        return(<Item key={item.ItemID} Item={item} />)
+                        return(<Item UserID={UserID} setNewFeed={setNewFeed} key={item.ItemID} Item={item} />)
                       })
                     }
                     </div>

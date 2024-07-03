@@ -1,8 +1,33 @@
 import React from 'react'
+import axios from 'axios';
 
 
-const Item = ({Item}) => {
+const Item = ({Item,setNewFeed,UserID}) => {
+  const deleteItem = ()=>{
+    const config = { 
+      headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+      },
+      data:{
+        
+          UserID:UserID,
+          ItemID:Item.ItemID,
+          Delete_Type:"USER_PRODUCT_DELETE"
+      }
+    }
 
+
+
+    const body = {
+      UserID:UserID,
+      ItemID:Item.ItemID,
+      Delete_Type:"USER_PRODUCT_DELETE"
+    }
+    axios.delete('http://localhost:5000/api/item/deleteItem', config).then(res =>{
+      setNewFeed(res.data.data.ItemList)
+    })
+  }
 
   return (
     <div className="SmallItem" key={Item.ItemID}>
