@@ -4,6 +4,7 @@ const {readFile,writeFile} = require('fs');
 const utils = require('util');
 const readTables = utils.promisify(readFile);
 const writeDataBase = utils.promisify(writeFile);
+const uniqid = require('uniqid');
 
 const auth_101 = async (req,res,next)=>{
     const {API_KEY} = req.query;
@@ -22,8 +23,7 @@ const auth_101 = async (req,res,next)=>{
         }
         if(keysAreTheSame){
             const key_list = await readTables('../db/auth/authKey.json','utf-8');
-            console.log(current_api_key)
-            const api_key_is_valid =(JSON.parse(key_list)).find(item => item === current_api_key);
+            const api_key_is_valid = (JSON.parse(key_list)).find(item => item === current_api_key);
             if (api_key_is_valid){
                 next();
             }else{
@@ -37,6 +37,13 @@ const auth_101 = async (req,res,next)=>{
     }
 };
 
+const generateAnAPIkey = async () =>{
+    const new_Api_key = uniqid();
+    const apiTable = await readTables('../db/auth/authKey.json','utf-8');
+    const newTable = [...(JSON.parse(apiTable),new_Api_key)];
+    await writeDataBase('../db/auth/authKey.json',JSON.stringify(newTable),'utf-8');
+    return new_Api_key;
+}
 
 
 module.exports = {auth_101}
