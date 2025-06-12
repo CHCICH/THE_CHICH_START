@@ -116,6 +116,7 @@ const LoginPage = ({setUserSecret,setUserID,setUsername}) => {
       headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'x-authorization':"client_private_key123sdfj123jsdjnf12j"
       }
     };
 

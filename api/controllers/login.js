@@ -61,4 +61,6 @@ const LogIn = async (req,res)=>{
     
 }
 
+
+//this is the controller for the login route indeed it helps to handle the verification and authenticate users before legging them into their account 
 module.exports = {LogIn};
